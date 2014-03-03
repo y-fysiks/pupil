@@ -5,7 +5,7 @@ OBJ = methods.c
 make_all: methods.so
 
 methods.so: $(OBJ)
-	-gcc $(CFLAGS) -o $@ $^
+	-gcc $(CFLAGS) -o $@ $^ -lrt
 
 .PHONY: clean
 
