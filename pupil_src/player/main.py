@@ -356,6 +356,7 @@ def main():
         #grab new frame
         if g.play or g.new_seek:
             test_frame = cap.get_frame()
+            print "%.10f"%test_frame.timestamp
             #end of video logic: pause at last frame.
             if not test_frame:
                 g.play=False
@@ -366,6 +367,7 @@ def main():
                 display_time = new_frame.timestamp
                 g.new_seek = False
 
+        g.play=False
 
         frame = new_frame.copy()
 
