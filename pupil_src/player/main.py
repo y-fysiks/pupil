@@ -388,6 +388,7 @@ def main():
         if g.play or g.new_seek:
             try:
                 new_frame = cap.get_frame()
+                print new_frame.timestamp
             except EndofVideoFileError:
                 #end of video logic: pause at last frame.
                 g.play=False
