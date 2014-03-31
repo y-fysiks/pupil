@@ -12,7 +12,7 @@ import os
 import cv2
 import numpy as np
 from methods import normalize,denormalize
-from gl_utils import draw_gl_point,draw_gl_point_norm,draw_gl_polyline, adjust_gl_view,clear_gl_screen,basic_gl_setup
+from gl_utils import draw_gl_point,adjust_gl_view,draw_gl_point_norm,draw_gl_polyline,clear_gl_screen,basic_gl_setup
 import OpenGL.GL as gl
 from glfw import *
 from OpenGL.GLU import gluOrtho2D
@@ -46,7 +46,7 @@ def draw_marker(pos):
 def on_resize(window,w, h):
     active_window = glfwGetCurrentContext()
     glfwMakeContextCurrent(window)
-    adjust_gl_view(w,h)
+    adjust_gl_view(w,h,window)
     glfwMakeContextCurrent(active_window)
 
 
@@ -82,8 +82,8 @@ class Screen_Marker_Calibration(Plugin):
         self.window_should_open = False
         self.fullscreen = c_bool(1)
         self.monitor_idx = c_int(0)
-        self.monitor_handles = glfwGetMonitors()
-        self.monitor_names = [glfwGetMonitorName(m) for m in self.monitor_handles]
+        monitor_handles = glfwGetMonitors()
+        self.monitor_names = [glfwGetMonitorName(m) for m in monitor_handles]
         monitor_enum = atb.enum("Monitor",dict(((key,val) for val,key in enumerate(self.monitor_names))))
         #primary_monitor = glfwGetPrimaryMonitor()
 
@@ -93,15 +93,14 @@ class Screen_Marker_Calibration(Plugin):
         # Creating an ATB Bar is required. Show at least some info about the Ref_Detector
         self._bar = atb.Bar(name = self.__class__.__name__, label=atb_label,
             help="ref detection parameters", color=(50, 50, 50), alpha=100,
-            text='light', position=atb_pos,refresh=.3, size=(300, 100))
+            text='light', position=atb_pos,refresh=.3, size=(300, 90))
         self._bar.add_var("monitor",self.monitor_idx, vtype=monitor_enum)
         self._bar.add_var("fullscreen", self.fullscreen)
         self._bar.add_button("  start calibrating  ", self.start, key='c')
 
-        self._bar.add_separator("Sep1")
-        self._bar.add_var("show edges",self.show_edges)
-        self._bar.add_var("area threshold", self.area_threshold)
-        self._bar.add_var("eccetricity threshold", self.dist_threshold)
+        self._bar.add_var("show edges",self.show_edges, group="Detector Variables")
+        self._bar.add_var("area threshold", self.area_threshold ,group="Detector Variables")
+        self._bar.add_var("eccetricity threshold", self.dist_threshold, group="Detector Variables" )
 
 
     def start(self):
@@ -110,11 +109,11 @@ class Screen_Marker_Calibration(Plugin):
 
         audio.say("Starting Calibration")
         logger.info("Starting Calibration")
-        self.sites = [  (.5, .5), (0,.5),
+        self.sites = [  (.25, .5), (0,.5),
                         (0.,1),(.5,1),(1.,1.),
                         (1,.5),
                         (1., 0),(.5, 0),(0,0.),
-                        (.5,.5),(.5,.5)]
+                        (.75,.5),(.75,.5)]
 
         self.active_site = 0
         self.active = True
@@ -125,7 +124,7 @@ class Screen_Marker_Calibration(Plugin):
     def open_window(self):
         if not self._window:
             if self.fullscreen.value:
-                monitor = self.monitor_handles[self.monitor_idx.value]
+                monitor = glfwGetMonitors()[self.monitor_idx.value]
                 mode = glfwGetVideoMode(monitor)
                 height,width= mode[0],mode[1]
             else:
