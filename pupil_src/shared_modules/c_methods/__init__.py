@@ -57,9 +57,6 @@ __methods_dll = CDLL(dll_path)
 
 
 
-__methods_dll.c_time.argtypes = []
-__methods_dll.c_time.restype = c_float
-
 ### C-Types Argtypes and Restype
 __methods_dll.filter.argtypes = [ndpointer(c_float),  # integral image
                                 c_size_t,           # rows/shape[0]
@@ -98,8 +95,6 @@ def ring_filter(integral):
     __methods_dll.ring_filter(integral,rows,cols,x,y,w,r)
     return x.value,y.value,w.value,r.value
 
-def c_time():
-    return __methods_dll.c_time()
 
 ### Debugging
 if __name__ == '__main__':
@@ -118,7 +113,3 @@ if __name__ == '__main__':
     integral =  np.array(integral,dtype=c_float)
     print ring_filter(integral)
 
-    import time
-    for x in range(50):
-        print c_time()
-        time.sleep(.01)

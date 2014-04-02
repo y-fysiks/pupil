@@ -51,14 +51,6 @@ typedef struct
 }ring_t;
 
 
-float c_time(void){
-    struct timespec raw_tv;
-    float timestamp;
-    clock_gettime(CLOCK_MONOTONIC_RAW, &raw_tv);
-    timestamp = raw_tv.tv_sec + (raw_tv.tv_nsec/1000000000.0);
-    return timestamp;
-}
-
 // inline float area(const float *img,point_t size,point_t start,point_t end){
 //     // use like in numpy including start excluding end
 //     // 0-based indecies

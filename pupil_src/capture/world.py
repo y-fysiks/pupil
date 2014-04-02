@@ -309,8 +309,8 @@ def world(g_pool,cap_src,cap_size):
             logger.warning("Video File is done. Stopping")
             break
 
+        logger.info("world frame passed to app: %s" %(cap.get_now()-frame.timestamp))
         update_fps()
-
 
         #a container that allows plugins to post and read events
         events = []
@@ -325,10 +325,13 @@ def world(g_pool,cap_src,cap_size):
                 p['norm_gaze'] = g_pool.map_pupil(p['norm_pupil'])
             recent_pupil_positions.append(p)
 
+        logger.info("readout of pupil info from eye queue: %s" %(cap.get_now()-frame.timestamp))
 
         # allow each Plugin to do its work.
         for p in g_pool.plugins:
             p.update(frame,recent_pupil_positions,events)
+
+        logger.info("all plugins executed: %s" %(cap.get_now()-frame.timestamp))
 
         #check if a plugin need to be destroyed
         g_pool.plugins = [p for p in g_pool.plugins if p.alive]

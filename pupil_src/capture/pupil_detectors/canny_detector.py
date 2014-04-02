@@ -33,7 +33,12 @@ from template import Pupil_Detector
 import logging
 logger = logging.getLogger(__name__)
 
-
+import platform
+if platform.system() == 'Linux':
+    from uvc_capture.linux_video.v4l2_capture import dll
+    get_now = dll.get_time_monotonic
+else:
+    from time import time as get_now
 # try:
 #     np.euler_gamma #constant introduced with 1.8, numpy.__version__ will give you strings with non int chars...
 # except AttributeError as error:
@@ -137,7 +142,7 @@ class Canny_Detector(Pupil_Detector):
         padding = coarse_pupil_width/4.
         pupil_img = gray_img[p_r.view]
 
-
+        logger.info("initial region estimation complete: %s" %(get_now()-frame.timestamp))
 
         # binary thresholding of pupil dark areas
         hist = cv2.calcHist([pupil_img],[0],None,[256],[0,256]) #(images, channels, mask, histSize, ranges[, hist[, accumulate]])
@@ -223,6 +228,9 @@ class Canny_Detector(Pupil_Detector):
         #get raw edge pix for later
         raw_edges = cv2.findNonZero(edges)
 
+        logger.info("edge extraction complete: %s" %(get_now()-frame.timestamp))
+
+
         def ellipse_true_support(e,raw_edges):
             a,b = e[1][0]/2.,e[1][1]/2. # major minor radii of candidate ellipse
             ellipse_circumference = np.pi*abs(3*(a+b)-np.sqrt(10*a*b+3*(a**2+b**2)))
@@ -275,6 +283,7 @@ class Canny_Detector(Pupil_Detector):
                         lines = np.array([[[2*x,debug_img.shape[0]-int(100*y)],[2*x,debug_img.shape[0]]] for x,y in enumerate(self.confidence_hist)])
                         cv2.polylines(debug_img,lines,isClosed=False,color=(255,100,100))
                         self.gl_display_in_window(debug_img)
+                    logger.info("strong prior confirmed early exit: %s" %(get_now()-frame.timestamp))
                     return pupil_ellipse
 
 
@@ -330,6 +339,8 @@ class Canny_Detector(Pupil_Detector):
 
         # removing stubs makes combinatorial search feasable
         split_contours = [c for c in split_contours if c.shape[0]>3]
+
+        logger.info("contrours extracted analyzed and filtered: %s" %(get_now()-frame.timestamp))
 
         def ellipse_filter(e):
             in_center = padding < e[0][1] < pupil_img.shape[0]-padding and padding < e[0][0] < pupil_img.shape[1]-padding
@@ -447,6 +458,7 @@ class Canny_Detector(Pupil_Detector):
                 #not a valid solution, bad rating
                 ratings.append(-1)
 
+        logger.info("ellipse fitting and support search complete: %s" %(get_now()-frame.timestamp))
 
         # selected ellipse
         if max(ratings) == -1:

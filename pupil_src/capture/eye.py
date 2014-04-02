@@ -214,6 +214,8 @@ def eye(g_pool,cap_src,cap_size):
             logger.warning("Video File is done. Stopping")
             break
 
+        logger.info("eye frame passed to appe: %s" %(cap.get_now()-frame.timestamp))
+
         update_fps()
         sleep(bar.sleep.value) # for debugging only
 
@@ -242,8 +244,11 @@ def eye(g_pool,cap_src,cap_size):
 
         # pupil ellipse detection
         result = pupil_detector.detect(frame,user_roi=u_r,visualize=bar.display.value == 2)
+        logger.info("pupil detected: %s" %(cap.get_now()-frame.timestamp))
+
         # stream the result
         g_pool.pupil_queue.put(result)
+        logger.info("pupil sent to world process: %s" %(cap.get_now()-frame.timestamp))
 
         # VISUALIZATION direct visualizations on the frame.img data
         if bar.display.value == 1:

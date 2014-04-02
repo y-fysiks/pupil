@@ -132,12 +132,12 @@ class File_Capture():
 
             try:
                 timestamp = self.timestamps[idx]
-                logger.warning("Filecapture is not a realtime source. -NOW- will be the current timestamp")
+                # logger.warning("Filecapture is not a realtime source. -NOW- will be the current timestamp")
             except IndexError:
                 logger.warning("timestamps not found.")
                 timestamp = 0
         else:
-            logger.warning("Filecapture is not a realtime source. -NOW- will be the current time.")
+            # logger.warning("Filecapture is not a realtime source. -NOW- will be the current time.")
             timestamp = time()
         return timestamp
 
