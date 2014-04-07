@@ -245,6 +245,12 @@ def eye(g_pool,cap_src,cap_size):
         # stream the result
         g_pool.pupil_queue.put(result)
 
+        if result['norm_pupil'] != None:
+            pupil_ellipse = result["center"],result['axes'],result['angle']
+        else:
+            pupil_ellipse = (0,0),(0,0),0
+        print cap.get_frame_index()-1,pupil_ellipse
+
         # VISUALIZATION direct visualizations on the frame.img data
         if bar.display.value == 1:
             # and a solid (white) frame around the user defined ROI
