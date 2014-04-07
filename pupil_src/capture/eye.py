@@ -245,6 +245,10 @@ def eye(g_pool,cap_src,cap_size):
         # stream the result
         g_pool.pupil_queue.put(result)
 
+
+        # Center of the box
+        # size Box width and height
+        # Angle between the horizontal axis and the first side (i.e. length) in degrees
         if result['norm_pupil'] != None:
             pupil_ellipse = result["center"],result['axes'],result['angle']
         else:
