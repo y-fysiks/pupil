@@ -56,7 +56,7 @@ def main(data_dir):
         true_ellipse = ground_truth_by_index.get(frame_index,None)
         if true_ellipse:
 
-            true_poly = np.array(ellipse_polyline( (true_ellipse[0]-1,true_ellipse[1]-1,true_ellipse[2],true_ellipse[3],true_ellipse[4]*(360./(2*np.pi))) ) ) # hand labeld center seems to be 1 based
+            true_poly = np.array(ellipse_polyline( (true_ellipse[0]-1,true_ellipse[1]-1,true_ellipse[2],true_ellipse[3],true_ellipse[4]*(360./(2*np.pi))) ) ) # hand labled center seems to be 1 based
             true_poly.shape=(-1,2)
             cv2.polylines(frame.img,true_poly.astype(np.int32).reshape((1,-1,2)),True,(0,255,0))
 
@@ -72,7 +72,7 @@ def main(data_dir):
 
     return results
 def calc_results(results):
-
+    # print np.mean(results)
     results = np.array(results)
     h,bins = np.histogram(results,5000,(0,500))
     # print h
