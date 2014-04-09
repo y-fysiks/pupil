@@ -602,4 +602,5 @@ class Canny_Detector(Pupil_Detector):
         self.save('pupil_max',self.pupil_max.value)
         self.save('min_contour_size',self.min_contour_size.value)
         self.save('final_perimeter_ratio_range',self.final_perimeter_ratio_range)
+        self.save('coarse_detection',self.coarse_detection.value)
         self.session_settings.close()

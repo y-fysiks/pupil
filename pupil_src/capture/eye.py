@@ -132,14 +132,14 @@ def eye(g_pool,cap_src,cap_size):
         logger.error("Did not receive valid Capture")
         return
     # check if it works
-    frame = cap.get_frame()
-    if frame.img is None:
-        logger.error("Could not retrieve image from capture")
-        cap.close()
-        return
-    height,width = frame.img.shape[:2]
+    # frame = cap.get_frame()
+    # if frame.img is None:
+    #     logger.error("Could not retrieve image from capture")
+    #     cap.close()
+    #     return
+    width,height = cap.get_size()
 
-    u_r = Roi(frame.img.shape)
+    u_r = Roi((height,width,3))
     u_r.set(load('roi',default=None))
 
     writer = None
@@ -196,12 +196,15 @@ def eye(g_pool,cap_src,cap_size):
 
     # gl_state settings
     basic_gl_setup()
-    g_pool.image_tex = create_named_texture(frame.img)
+    g_pool.image_tex = create_named_texture((height,width,3))
 
     # refresh speed settings
     glfwSwapInterval(0)
 
-
+    results_txt_path = os.path.join(os.path.dirname(cap_src),"pupil_detected_ellipses.txt")
+    results_npy_path = os.path.join(os.path.dirname(cap_src),"pupil_detected_ellipses.npy")
+    results_txt  = open(results_txt_path,'w')
+    results = []
     # event loop
     while not g_pool.quit.value:
         # Get an image from the grabber
@@ -250,10 +253,13 @@ def eye(g_pool,cap_src,cap_size):
         # size Box width and height
         # Angle between the horizontal axis and the first side (i.e. length) in degrees
         if result['norm_pupil'] != None:
-            pupil_ellipse = result["center"],result['axes'],result['angle']
+            pupil_ellipse = result["center"]+result['axes']+(result['angle'],)
         else:
-            pupil_ellipse = (0,0),(0,0),0
-        print cap.get_frame_index()-1,pupil_ellipse
+            pupil_ellipse = 0,0,0,0,0
+
+
+        results_txt.write(str(cap.get_frame_index()-1)+" | "+str(pupil_ellipse).replace('(','').replace(')','').replace(',','')+"\n")
+        results.append(((cap.get_frame_index()-1,)+pupil_ellipse))
 
         # VISUALIZATION direct visualizations on the frame.img data
         if bar.display.value == 1:
@@ -289,7 +295,9 @@ def eye(g_pool,cap_src,cap_size):
         glfwPollEvents()
 
     # END while running
-
+    results = np.array(results)
+    np.save(results_npy_path,results)
+    results_txt.close()
     # in case eye reconding was still runnnig: Save&close
     if writer:
         logger.info("Done recording eye.")
