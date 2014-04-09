@@ -260,6 +260,8 @@ def eye(g_pool,cap_src,cap_size):
 
         results_txt.write(str(cap.get_frame_index()-1)+" | "+str(pupil_ellipse).replace('(','').replace(')','').replace(',','')+"\n")
         results.append(((cap.get_frame_index()-1,)+pupil_ellipse))
+        if result['norm_pupil'] != None:
+            cv2.ellipse(frame.img,(result['center'],result['axes'],result['angle']),(0,0,255))
 
         # VISUALIZATION direct visualizations on the frame.img data
         if bar.display.value == 1:

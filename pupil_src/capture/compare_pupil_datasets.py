@@ -49,27 +49,16 @@ def main(data_dir):
 
 
         pupil_ellipse = pupil_data[frame_index]
-        e_img = np.zeros(frame.img.shape,dtype=np.uint8)
-        cv2.ellipse(frame.img,((pupil_ellipse[1],pupil_ellipse[2]),
-                                        (pupil_ellipse[3],pupil_ellipse[4]),
-                                        pupil_ellipse[5]),(0,0,255))
-        cv2.ellipse(e_img,((pupil_ellipse[1],pupil_ellipse[2]),
-                                        (pupil_ellipse[3],pupil_ellipse[4]),
-                                        pupil_ellipse[5]),(255,255,255))
-        pupil_poly = cv2.findNonZero(e_img[:,:,0])
+        pupil_poly = np.array(ellipse_polyline( (pupil_ellipse[1] ,pupil_ellipse[2], pupil_ellipse[3]/2.,pupil_ellipse[4]/2., pupil_ellipse[5]) ))
         pupil_poly.shape=(-1,2)
+        cv2.polylines(frame.img,pupil_poly.astype(np.int32).reshape((1,-1,2)),True,(255,0,0))
 
         true_ellipse = ground_truth_by_index.get(frame_index,None)
         if true_ellipse:
-            e_img = np.zeros(frame.img.shape,dtype=np.uint8)
-            cv2.ellipse(frame.img,((true_ellipse[0],true_ellipse[1]),
-                                        (true_ellipse[2]*2,true_ellipse[3]*2),
-                                        true_ellipse[4]*(360./(2*np.pi))),(0,255,0))
-            cv2.ellipse(e_img,((true_ellipse[0],true_ellipse[1]),
-                                        (true_ellipse[2]*2,true_ellipse[3]*2),
-                                         true_ellipse[4]*(360./(2*np.pi))),(255,255,255))
-            true_poly = cv2.findNonZero(e_img[:,:,0])
+
+            true_poly = np.array(ellipse_polyline( (true_ellipse[0]-1,true_ellipse[1]-1,true_ellipse[2],true_ellipse[3],true_ellipse[4]*(360./(2*np.pi))) ) ) # hand labeld center seems to be 1 based
             true_poly.shape=(-1,2)
+            cv2.polylines(frame.img,true_poly.astype(np.int32).reshape((1,-1,2)),True,(0,255,0))
 
             d_matrix = sp.distance.cdist(true_poly,pupil_poly)
             results.append(max(np.min(d_matrix,0)))
@@ -85,24 +74,46 @@ def main(data_dir):
 def calc_results(results):
 
     results = np.array(results)
-    h,bins = np.histogram(results,500,(0,500))
-    print h
+    h,bins = np.histogram(results,5000,(0,500))
+    # print h
     h = np.cumsum(h)
     h *= 100./len(results)
+    print h
     return h
 
-if __name__ == '__main__':
-    # r0 = main('/Users/mkassner/Pupil/datasets/p2-right/frames/')
-    # r1 = main('/Users/mkassner/Pupil/datasets/p1-left/frames/')
-    # r2 = main('/Users/mkassner/Pupil/datasets/p2-left/frames/')
-    # # r3 = main('/Users/mkassner/Pupil/datasets/p1-right/frames/')
 
-    # r = r0 + r2 + r2 #+r3
-    # r = np.array(r)
-    # h = calc_results(r)
-    # np.save("pupil_results.npy",h)
-    h = np.load("pupil_results.npy")
-    from matplotlib import pyplot as plt
-    fig = plt.plot(h)
-    fig.show()
+
+def ellipse_polyline(ellipse, n=100):
+    t = np.linspace(0, 2*np.pi, n, endpoint=False)
+    st = np.sin(t)
+    ct = np.cos(t)
+    result = []
+    for x0, y0, a, b, angle in (ellipse,):
+        angle = np.deg2rad(angle)
+        sa = np.sin(angle)
+        ca = np.cos(angle)
+        p = np.empty((n, 2))
+        p[:, 0] = x0 + a * ca * ct - b * sa * st
+        p[:, 1] = y0 + a * sa * ct + b * ca * st
+        result.append(p)
+    return result
+
+
+if __name__ == '__main__':
+    if 1:
+        r0 = main('/Users/mkassner/Pupil/datasets/p2-right/frames/')
+        r1 = main('/Users/mkassner/Pupil/datasets/p1-left/frames/')
+        r2 = main('/Users/mkassner/Pupil/datasets/p2-left/frames/')
+        r3 = main('/Users/mkassner/Pupil/datasets/p1-right/frames/')
+
+        r = r0 + r2 + r2 +r3
+        r = np.array(r)
+        h = calc_results(r)
+        np.save("pupil_results.npy",h)
+    else:
+        h = np.load("pupil_results.npy")
+        import matplotlib.pyplot as plt
+        plt.axis([0, 10, 0, 100])
+        plt.plot(np.arange(0,500,.1),h,color='c')
+        plt.show()
 
