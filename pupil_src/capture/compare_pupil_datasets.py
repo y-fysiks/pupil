@@ -83,7 +83,7 @@ def calc_results(results):
 
 
 
-def ellipse_polyline(ellipse, n=100):
+def ellipse_polyline(ellipse, n=200):
     t = np.linspace(0, 2*np.pi, n, endpoint=False)
     st = np.sin(t)
     ct = np.cos(t)
@@ -106,14 +106,16 @@ if __name__ == '__main__':
         r2 = main('/Users/mkassner/Pupil/datasets/p2-left/frames/')
         r3 = main('/Users/mkassner/Pupil/datasets/p1-right/frames/')
 
-        r = r0 + r2 + r2 +r3
+        r = r0 + r2 + r2+r3
         r = np.array(r)
         h = calc_results(r)
         np.save("pupil_results.npy",h)
     else:
         h = np.load("pupil_results.npy")
+        h_full = np.load("pupil_results_full.npy")
         import matplotlib.pyplot as plt
         plt.axis([0, 10, 0, 100])
         plt.plot(np.arange(0,500,.1),h,color='c')
+        plt.plot(np.arange(0,500,.1),h_full,color='c',linestyle=':')
         plt.show()
 
