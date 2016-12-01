@@ -68,7 +68,7 @@ class Binocular_Gaze_Mapper_Base(Gaze_Mapping_Plugin):
         self.temportal_cutoff = 0.3
         self.sample_cutoff = 10
 
-    def on_pupil_datum(self, p):
+    def on_pupil_datum_closest(self, p):
         if p['confidence'] >= self.min_pupil_confidence:
             self._caches[p['id']].append(p)
 
@@ -102,6 +102,44 @@ class Binocular_Gaze_Mapper_Base(Gaze_Mapping_Plugin):
             return [gaze_datum,]
         else:
             return []
+
+    def on_pupil_datum_interpolate(self, p):
+        if p['confidence'] >= self.min_pupil_confidence:
+            self._caches[p['id']].append(p)
+
+        if self._caches[0] and self._caches[1] and len(self._caches[0])+len(self._caches[1]) >2:
+            #we have binocular data and at least two
+
+            if self._caches[0][0]['timestamp'] < self._caches[1][0]['timestamp']:
+                p0 = self._caches[0].pop(0)
+                p1 = self._caches[1][0]
+                older_pt = p0
+            else:
+                p0 = self._caches[0][0]
+                p1 = self._caches[1].pop(0)
+                older_pt = p1
+
+            if abs(p0['timestamp'] - p1['timestamp']) < self.temportal_cutoff:
+                gaze_datum = self._map_binocular(p0,p1)
+            else:
+                gaze_datum = self._map_monocular(older_pt)
+
+        elif len(self._caches[0])>self.sample_cutoff:
+            p = self._caches[0].pop(0)
+            gaze_datum = self._map_monocular(p)
+        elif len(self._caches[1])>self.sample_cutoff:
+            p = self._caches[1].pop(0)
+            gaze_datum = self._map_monocular(p)
+        else:
+            gaze_datum = None
+
+        if gaze_datum:
+            return [gaze_datum,]
+        else:
+            return []
+
+
+
 
 
 
@@ -168,7 +206,7 @@ class Binocular_Gaze_Mapper(Binocular_Gaze_Mapper_Base,Gaze_Mapping_Plugin):
         self.menu.append(ui.Switch('multivariate',self,label='Multivariate Mode'))
 
 
-    def _map_binocular(self, p0, p1):
+    def _map_binocular(self, p0, p1,base_data=()):
         if self.multivariate:
             gaze_point = self.map_fn(p0['norm_pos'], p1['norm_pos'])
         else:
@@ -177,7 +215,7 @@ class Binocular_Gaze_Mapper(Binocular_Gaze_Mapper_Base,Gaze_Mapping_Plugin):
             gaze_point = (gaze_point_eye0[0] + gaze_point_eye1[0])/2. , (gaze_point_eye0[1] + gaze_point_eye1[1])/2.
         confidence = (p0['confidence'] + p1['confidence'])/2.
         ts = (p0['timestamp'] + p1['timestamp'])/2.
-        return {'topic':'gaze','norm_pos':gaze_point,'confidence':confidence,'timestamp':ts,'base_data':[p0, p1]}
+        return {'topic':'gaze','norm_pos':gaze_point,'confidence':confidence,'timestamp':ts,'base_data':base_data or (p0,p1)}
 
     def _map_monocular(self,p):
         gaze_point = self.map_fn_fallback[p['id']](p['norm_pos'])
@@ -393,7 +431,7 @@ class Binocular_Vector_Gaze_Mapper(Binocular_Gaze_Mapper_Base,Gaze_Mapping_Plugi
 
         return g
 
-    def _map_binocular(self, p0, p1):
+    def _map_binocular(self, p0, p1,base_data=()):
 
         if '3d' not in p0['method'] or '3d' not in p1['method']:
             return None
@@ -462,7 +500,7 @@ class Binocular_Vector_Gaze_Mapper(Binocular_Gaze_Mapper_Base,Gaze_Mapping_Plugi
                 'gaze_point_3d':nearest_intersection_point.tolist(),
                 'confidence':confidence,
                 'timestamp':ts,
-                'base_data':[p0,p1]}
+                'base_data':base_data or (p0,p1)}
         return g
 
     def gl_display(self):

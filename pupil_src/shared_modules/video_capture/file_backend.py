@@ -87,7 +87,8 @@ class File_Source(Base_Source):
     """
     def __init__(self,g_pool,source_path=None,timestamps=None,*args,**kwargs):
         if not source_path or not os.path.isfile(source_path):
-            raise InitialisationError()
+            print source_path
+            raise InitialisationError("File is not Found %s"%source_path)
 
         super(File_Source,self).__init__(g_pool)
         self.display_time = 0.
