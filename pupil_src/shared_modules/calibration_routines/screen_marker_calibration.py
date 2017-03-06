@@ -82,6 +82,7 @@ class Screen_Marker_Calibration(Calibration_Plugin):
 
 
         self.active_site = None
+        self.active_site_idx = 0
         self.sites = []
         self.display_pos = None
         self.on_position = False
@@ -165,6 +166,7 @@ class Screen_Marker_Calibration(Calibration_Plugin):
 
         self.active_site = self.sites.pop(0)
         self.active = True
+        self.active_site_idx = 0
         self.ref_list = []
         self.pupil_list = []
         self.clicks_to_close = 5
@@ -264,6 +266,7 @@ class Screen_Marker_Calibration(Calibration_Plugin):
                 ref["norm_pos"] = self.pos
                 ref["screen_pos"] = marker_pos
                 ref["timestamp"] = frame.timestamp
+                ref["site"] = self.active_site_idx
                 self.ref_list.append(ref)
 
             # always save pupil positions
@@ -285,6 +288,7 @@ class Screen_Marker_Calibration(Calibration_Plugin):
                 if not self.sites:
                     self.stop()
                     return
+                self.active_site_idx += 1
                 self.active_site = self.sites.pop(0)
                 logger.debug("Moving screen marker to site at {} {}".format(*self.active_site))
 

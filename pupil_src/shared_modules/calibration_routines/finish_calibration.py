@@ -56,6 +56,16 @@ def finish_calibration(g_pool,pupil_list,ref_list):
     logger.info('Collected {} binocular calibration data.'.format(len(matched_binocular_data)))
 
 
+    #warn user if some marker sites did not have eye samples:
+    all_sites = {d.get('site',0) for d in ref_list}
+    if matched_binocular_data:
+        correlated_sites = {d['ref'].get('site',0) for d in matched_binocular_data}
+    else:
+        correlated_sites = {d['ref'].get('site',0) for d in matched_monocular_data}
+    for s in all_sites:
+        if s not in correlated_sites:
+            logger.warning("During calibration site {} did not collect good eye data!".format(s))
+
     mode = g_pool.detection_mapping_mode
 
     if mode == '3d' and not camera_intrinsics:
