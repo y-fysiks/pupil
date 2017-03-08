@@ -64,7 +64,7 @@ def finish_calibration(g_pool,pupil_list,ref_list):
         correlated_sites = {d['ref'].get('site',0) for d in matched_monocular_data}
     for s in all_sites:
         if s not in correlated_sites:
-            logger.warning("During calibration site {} did not collect good eye data!".format(s))
+            logger.warning("During calibration site {} did not collect good eye data and will be ignored!".format(s))
 
     mode = g_pool.detection_mapping_mode
 
