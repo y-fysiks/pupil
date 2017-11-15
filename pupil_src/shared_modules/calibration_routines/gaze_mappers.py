@@ -339,6 +339,8 @@ class Binocular_Vector_Gaze_Mapper(Binocular_Gaze_Mapper_Base,Gaze_Mapping_Plugi
 
 
     def init_ui(self):
+        self.gaze0 = None
+        self.gaze1 = None
         self.add_menu()
         self.visualizer = Calibration_Visualizer(self.g_pool,
                                                  cal_ref_points_3d=self.cal_points_3d,
@@ -355,7 +357,8 @@ class Binocular_Vector_Gaze_Mapper(Binocular_Gaze_Mapper_Base,Gaze_Mapping_Plugi
                 self.visualizer.close_window()
 
         self.menu.label = 'Binocular 3D gaze mapper'
-        # self.menu.append(ui.Text_Input('last_gaze_distance',self))
+        self.menu.append(ui.Text_Input('gaze0',self))
+        self.menu.append(ui.Text_Input('gaze1',self))
         self.menu.append(ui.Switch('debug window',setter=open_close_window, getter=lambda: bool(self.visualizer.window) ))
 
     def deinit_ui(self):
@@ -473,6 +476,10 @@ class Binocular_Vector_Gaze_Mapper(Binocular_Gaze_Mapper_Base,Gaze_Mapping_Plugi
                 'confidence':confidence,
                 'timestamp':ts,
                 'base_data':[p0,p1]}
+
+        self.gaze0 = "%1.1f,%1.1f,%1.1f"%(tuple(s0_normal.tolist()))
+        self.gaze1 = "%1.1f,%1.1f,%1.1f"%(tuple(s1_normal.tolist()))
+
         return g
 
     def gl_display(self):
