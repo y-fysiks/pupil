@@ -29,9 +29,10 @@ class PureDetectorPlugin(PupilDetectorPlugin):
     def __init__(self, g_pool=None):
         super().__init__(g_pool=g_pool)
         self.detector = PuReDetector()
+        self.debug_view = False
 
     def detect(self, frame):
-        if self.g_pool.display_mode == "algorithm":
+        if self.debug_view:
             result, debug_img = self.detector.detect_debug(frame.gray)
             frame.bgr[:] = debug_img
         else:
@@ -96,11 +97,13 @@ class PureDetectorPlugin(PupilDetectorPlugin):
             ),
         ]
 
-        self.menu.extend(self.pupil_diameter_sliders)
-
         # TODO: This does not work in init_ui. Probably a pylgui bug.
         for ui_elem in self.pupil_diameter_sliders:
             ui_elem.read_only = self.detector.params.auto_pupil_diameter
+
+        self.menu.extend(self.pupil_diameter_sliders)
+
+        self.menu.append(ui.Switch("debug_view", self, label="Debug View"))
 
     def on_resolution_change(self, old_size, new_size):
         pass

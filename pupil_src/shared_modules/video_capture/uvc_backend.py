@@ -807,6 +807,8 @@ class UVC_Source(Base_Source):
         if self._recent_frame is not None:
             frame = self._recent_frame
             if (
+                False   # TODO: ONLY FOR DEBUGGING! REPLACE BEFORE MERGE!
+                and     # TODO: ONLY FOR DEBUGGING! REPLACE BEFORE MERGE!
                 # `frame.yuv_subsampling` is `None` without calling `frame.yuv_buffer`
                 frame.yuv_buffer is not None
                 and TJSAMP(frame.yuv_subsampling) == TJSAMP.TJSAMP_422
