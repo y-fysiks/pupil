@@ -14,6 +14,7 @@ import traceback
 import typing as T
 
 from pupil_detectors import DetectorBase
+from pyglui import ui
 
 from plugin import Plugin
 
@@ -61,6 +62,9 @@ class PupilDetectorPlugin(Plugin):
     def init_ui(self):
         self.add_menu()
 
+        # TODO: ONLY FOR DEBUGGING! REPLACE BEFORE MERGE!
+        self.menu.append(ui.Switch("enabled", self))
+
     def deinit_ui(self):
         self.remove_menu()
 
@@ -71,7 +75,7 @@ class PupilDetectorPlugin(Plugin):
     @enabled.setter
     def enabled(self, value):
         self._enabled = value
-        for elem in self.menu:
+        for elem in self.menu[1:]:
             elem.read_only = not self.enabled
 
     def recent_events(self, event):
