@@ -14,6 +14,7 @@ from pure_detector import PuReDetector
 from pyglui import ui
 
 from methods import normalize
+from roi import RoiModel
 
 from .detector_base_plugin import PupilDetectorPlugin
 from .visualizer_2d import draw_pupil_outline
@@ -32,11 +33,38 @@ class PureDetectorPlugin(PupilDetectorPlugin):
         self.debug_view = False
 
     def detect(self, frame):
+
+        gray = frame.gray
+        roi: RoiModel = self.g_pool.roi
+
+        # slice out the roi
+        if not roi.is_full():
+            gray = gray[roi.slices].copy()
+
         if self.debug_view:
-            result, debug_img = self.detector.detect_debug(frame.gray)
-            frame.bgr[:] = debug_img
+            result, debug_img = self.detector.detect_debug(gray)
+
+            # TODO: BGR is not always the color image, might also be yuv. See UVC for
+            # another related TODO.
+            if roi.is_full():
+                # replace bgr image (property is not writable, so we write directly into
+                # the buffer)
+                frame.bgr[:] = debug_img
+            else:
+                # stitch debug roi slice into bgr image
+                frame.bgr[roi.slices] = debug_img
         else:
-            result = self.detector.detect(frame.gray)
+            result = self.detector.detect(gray)
+
+        # if we are using roi, scale the results back up again
+        if not roi.is_full():
+            offset = roi.bounds[:2]
+            result["location"] = tuple(
+                coord + off for coord, off in zip(result["location"], offset)
+            )
+            result["ellipse"]["center"] = tuple(
+                coord + off for coord, off in zip(result["ellipse"]["center"], offset)
+            )
 
         eye_id = self.g_pool.eye_id
         location = result["location"]
