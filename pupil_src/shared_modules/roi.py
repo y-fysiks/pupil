@@ -144,6 +144,15 @@ class RoiModel(Observable):
 
         self.on_changed()
 
+    def is_full(self) -> bool:
+        """Returns true if the roi is set to the full frame size."""
+        return self.bounds == (0, 0, self._frame_width - 1, self._frame_height - 1)
+
+    @property
+    def slices(self) -> T.Tuple[slice, slice]:
+        """Returns (row, column) slices for indexing numpy arrays or similar."""
+        return slice(self._miny, self._maxy + 1), slice(self._minx, self._maxx + 1)
+
     def __str__(self):
         return f"Roi(frame={self.frame_size}, bounds={self.bounds})"
 
