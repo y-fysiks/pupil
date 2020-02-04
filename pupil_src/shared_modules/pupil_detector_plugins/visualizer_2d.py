@@ -33,7 +33,7 @@ def draw_eyeball_outline(pupil_detection_result_3d):
     )
 
 
-def draw_pupil_outline(pupil_detection_result_2d):
+def draw_pupil_outline(pupil_detection_result_2d, base_color=(1, 0, 0)):
     """Requires `"ellipse" in pupil_detection_result_2d`"""
     if pupil_detection_result_2d["confidence"] <= 0.0:
         return
@@ -59,10 +59,10 @@ def draw_pupil_outline(pupil_detection_result_2d):
         return
 
     confidence = pupil_detection_result_2d["confidence"] * 0.7
-    draw_polyline(pts, 1, RGBA(1.0, 0, 0, confidence))
+    draw_polyline(pts, 1, RGBA(*base_color, confidence))
     draw_points(
         [pupil_detection_result_2d["ellipse"]["center"]],
         size=20,
-        color=RGBA(1.0, 0.0, 0.0, confidence),
+        color=RGBA(*base_color, confidence),
         sharpness=1.0,
     )
