@@ -22,6 +22,13 @@ from .visualizer_2d import draw_pupil_outline
 logger = logging.getLogger(__name__)
 
 
+# TODO: This should go to some utils
+def info_text_from_multiline(text: str) -> ui.Info_Text:
+    """Create ui.Info_Text from Python multiline string literals."""
+    stripped = " ".join(line.strip() for line in text.strip().splitlines())
+    return ui.Info_Text(stripped)
+
+
 class PureDetectorPlugin(PupilDetectorPlugin):
     uniqueness = "by_class"
     icon_font = "pupil_icons"
@@ -33,7 +40,6 @@ class PureDetectorPlugin(PupilDetectorPlugin):
         self.debug_view = False
 
     def detect(self, frame):
-
         gray = frame.gray
         roi: RoiModel = self.g_pool.roi
 
@@ -101,6 +107,17 @@ class PureDetectorPlugin(PupilDetectorPlugin):
         self.menu_icon.label_font = "pupil_icons"
 
         self.menu.append(
+            info_text_from_multiline(
+                """
+                Use the default diameters, if the width of your eye from canthus to
+                canthus is roughly the width of the image. You can visualize the min/max
+                pupil diameter by enabling the debug view below. For different setups,
+                adjust the min/max diameters manually or consider using the
+                region-of-interest (ROI) selection in the general settings.
+                """
+            )
+        )
+        self.menu.append(
             ui.Switch(
                 "use_default_pupil_diameter", self, label="Use Default Pupil Diameter"
             )
@@ -131,6 +148,15 @@ class PureDetectorPlugin(PupilDetectorPlugin):
 
         self.menu.extend(self.pupil_diameter_sliders)
 
+        self.menu.append(
+            info_text_from_multiline(
+                """
+                Use the debug view to check the pupil diameter limits and investigate
+                problems. Keep this disabled for normal usage as it will consume more
+                resources.
+                """
+            )
+        )
         self.menu.append(ui.Switch("debug_view", self, label="Debug View"))
 
     def on_resolution_change(self, old_size, new_size):
