@@ -110,7 +110,16 @@ class PluginTaskManager:
         for task in self._recently_added_tasks:
             # we test because the user might have already started it manually
             if not task.started:
-                task.start()
+                import time
+                import cProfile
+
+                with cProfile.Profile() as pr:
+                    t0 = time.perf_counter()
+                    task.start()
+                    dur = time.perf_counter() - t0
+                print(f"@@@@@@ Task {task} took {dur} seconds to start")
+                pr.print_stats(sort="cumtime")
+
             self._recently_added_tasks.remove(task)
             self._running_tasks.append(task)
 
