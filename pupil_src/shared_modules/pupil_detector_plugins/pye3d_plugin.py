@@ -30,7 +30,7 @@ class Pye3DPlugin(PupilDetectorPlugin):
 
     def __init__(self, g_pool):
         super().__init__(g_pool)
-        self.detector = Detector3D()
+        self.detector = Detector3D(log_handler=logger.root.handlers[0])
         self.debugVisualizer3D = Eye_Visualizer(
             g_pool, self.detector.settings["focal_length"]
         )
