@@ -302,9 +302,8 @@ class JPEG_Writer(AV_Writer):
 
     def encode_frame(self, input_frame, pts: int) -> T.Iterator[Packet]:
         # for JPEG we only get a single packet per frame
-        packet = Packet()
+        packet = Packet(input_frame.jpeg_buffer)
         packet.stream = self.video_stream
-        packet.update(input_frame.jpeg_buffer)
         packet.time_base = self.time_base
         packet.pts = pts
         # TODO: check if we still need dts here, as they were removed from MPEG_Writer
