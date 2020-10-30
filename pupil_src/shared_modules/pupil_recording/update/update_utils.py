@@ -13,7 +13,7 @@ import logging
 import typing as T
 from pathlib import Path
 
-import av
+from pupil_av import av  # FIXME
 import numpy as np
 
 import camera_models as cm

@@ -16,8 +16,9 @@ from bisect import bisect_left as bisect
 from threading import Timer
 from time import monotonic
 
-import av
-import av.filter
+from pupil_av import av  # FIXME
+import pupil_av.av.filter  # FIXME
+
 import numpy as np
 import pyaudio as pa
 import pyglui.cygl.utils as pyglui_utils

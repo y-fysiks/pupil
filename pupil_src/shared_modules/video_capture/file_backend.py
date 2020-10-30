@@ -18,7 +18,7 @@ from abc import ABC, abstractmethod
 from multiprocessing import cpu_count
 from time import sleep
 
-import av
+from pupil_av import av  # FIXME
 import numpy as np
 from pyglui import ui
 

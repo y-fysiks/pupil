@@ -11,7 +11,7 @@ See COPYING and COPYING.LESSER for license details.
 import collections
 import logging
 
-import av
+from pupil_av import av  # FIXME
 import numpy as np
 
 import pupil_recording

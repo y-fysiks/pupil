@@ -16,7 +16,7 @@ from pathlib import Path
 import re
 
 
-import av
+from pupil_av import av  # FIXME
 import cv2
 import numpy as np
 

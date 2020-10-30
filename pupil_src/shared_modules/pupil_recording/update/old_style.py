@@ -17,7 +17,8 @@ import uuid
 from pathlib import Path
 from shutil import copy2
 
-import av
+from pupil_av import av  # FIXME
+
 import numpy as np
 from scipy.interpolate import interp1d
 

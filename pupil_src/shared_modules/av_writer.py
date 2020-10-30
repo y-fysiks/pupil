@@ -18,9 +18,10 @@ import os
 import typing as T
 from fractions import Fraction
 
-import av
 import numpy as np
-from av.packet import Packet
+
+from pupil_av import av  # FIXME
+from pupil_av.av.packet import Packet  # FIXME
 
 import audio_utils
 from video_capture.utils import Video, InvalidContainerError
