@@ -21,7 +21,7 @@ from fractions import Fraction
 import numpy as np
 
 from pupil_av import av  # FIXME
-from pupil_av import av.packet.Packet as Packet  # FIXME
+from av.packet import Packet  # FIXME
 
 import audio_utils
 from video_capture.utils import Video, InvalidContainerError
