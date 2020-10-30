@@ -17,7 +17,7 @@ from threading import Timer
 from time import monotonic
 
 from pupil_av import av  # FIXME
-import pupil_av.av.filter  # FIXME
+from pupil_av import av.filter as filter  # FIXME
 
 import numpy as np
 import pyaudio as pa
