@@ -113,9 +113,9 @@ class dataFeederPlugin(Plugin):
 
     # if you want a session persistent plugin implement this function:
     def get_init_dict(self):
-        # aise NotImplementedError() if you dont want you plugin to be persistent.
+        # raise NotImplementedError() if you dont want you plugin to be persistent.
 
-        d = {}
+        d = {self}
         # add all aguments of your plugin init fn with paramter names as name field
         # do not include g_pool here.
         return d
