@@ -6,7 +6,7 @@
         {
             "label": "run pupil capture",
             "type": "shell",
-            "command": ".\\activate.ps1",
+            "command": ".\\run.ps1",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
