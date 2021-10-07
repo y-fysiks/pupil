@@ -1,11 +1,9 @@
-from plugin import System_Plugin_Base
-from pyglui.cygl.utils import RGBA
-from gl_utils import draw_circle_filled_func_builder
+from plugin import Plugin
 from methods import denormalize
 import sched, time, threading
 import pyautogui as pag
 
-class dataFeederPlugin(System_Plugin_Base):
+class dataFeederPlugin(Plugin):
     """
     datafeeder is a plugin that will send data to the custom C# User Interface application in order to control the mouse. 
     """
@@ -36,22 +34,15 @@ class dataFeederPlugin(System_Plugin_Base):
             self.__monkeypatch_gl_display_error_checking()
 
     def recent_events(self, events):
+        print("test")
         for pt in events.get("gaze", []):
             recent_frame_size = self.g_pool.capture.frame_size
             point = denormalize(pt["norm_pos"], recent_frame_size, flip_y=True)
             self.pupil_display_list.append((point, pt["confidence"] * 0.8))
-            print("point logged: " + str(self.pupil_display_list[len(self.pupil_display_list)-1]))
+            ppt = self.pupil_display_list[-1]
+            print(tuple(ppt))
 
         self.pupil_display_list[:-3] = []
-
-    def gl_display(self):
-        for pt, a in self.pupil_display_list:
-            # This could be faster if there would be a method to also add multiple colors per point
-            self._draw_circle_filled(
-                tuple(pt),
-                size=35 / 2,
-                color=RGBA(1.0, 0.2, 0.4, a),
-            )
 
     def get_init_dict(self):
         return {}
