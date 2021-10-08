@@ -1,6 +1,5 @@
 from plugin import Plugin
 from methods import denormalize
-import sched, time, threading
 import pyautogui as pag
 
 class dataFeederPlugin(Plugin):
@@ -18,13 +17,12 @@ class dataFeederPlugin(Plugin):
     # == .5 is the default.
     # >.5 are things that depend on other plugins work like display , saving and streaming
     # you can change this in __init__ for your instance or in the class definition
-    order = 0.6
+    order = 0.8
     alive = True
 
     # menu icon font, possible values `roboto`, `opensans`, `pupil_icons`,
     # or custom loaded font name
-    icon_font = "pupil_icons"
-    icon_chr = "?"  # character shown in menu icon
+    icon_font = "pupil_icons"    
             
     def __init__(self, g_pool):
         super().__init__(g_pool)
@@ -34,7 +32,7 @@ class dataFeederPlugin(Plugin):
             self.__monkeypatch_gl_display_error_checking()
 
     def recent_events(self, events):
-        print("test")
+
         for pt in events.get("gaze", []):
             recent_frame_size = self.g_pool.capture.frame_size
             point = denormalize(pt["norm_pos"], recent_frame_size, flip_y=True)
@@ -42,7 +40,7 @@ class dataFeederPlugin(Plugin):
             ppt = self.pupil_display_list[-1]
             print(tuple(ppt))
 
-        self.pupil_display_list[:-3] = []
+        self.pupil_display_list[0:-3] = []
 
     def get_init_dict(self):
         return {}
