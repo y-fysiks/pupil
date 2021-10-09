@@ -35,6 +35,7 @@ settings/
 *.sublime-project
 *.sublime-workspace
 .idea
+.vscode
 #directory for test file will be ignored
 Pupil_Test_Files
 *.mkv
@@ -53,3 +54,5 @@ win_drv
 
 # pyenv local config
 .python-version
+
+run.ps1
