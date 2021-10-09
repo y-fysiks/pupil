@@ -22,7 +22,7 @@ class dataFeederPlugin(Plugin):
 
     # menu icon font, possible values `roboto`, `opensans`, `pupil_icons`,
     # or custom loaded font name
-    icon_font = "pupil_icons"    
+    icon_font = "pupil_icons"
             
     def __init__(self, g_pool):
         super().__init__(g_pool)
