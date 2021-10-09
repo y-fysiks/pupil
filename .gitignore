@@ -35,7 +35,6 @@ settings/
 *.sublime-project
 *.sublime-workspace
 .idea
-.vscode
 #directory for test file will be ignored
 Pupil_Test_Files
 *.mkv
