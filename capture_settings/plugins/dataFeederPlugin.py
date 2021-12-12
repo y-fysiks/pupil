@@ -37,9 +37,8 @@ class dataFeederPlugin(Plugin):
             recent_frame_size = self.g_pool.capture.frame_size
             point = denormalize(pt["norm_pos"], recent_frame_size, flip_y=True)
             self.pupil_display_list.append((point, pt["confidence"] * 0.8))
-            ppt = self.pupil_display_list[-1]
-            print(tuple(ppt))
-
+            print(f"{point} {pt['confidence']}")
+            print(tuple(recent_frame_size))
         self.pupil_display_list[0:-3] = []
 
     def get_init_dict(self):
