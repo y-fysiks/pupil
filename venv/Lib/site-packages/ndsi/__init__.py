@@ -1,0 +1,57 @@
+"""
+(*)~----------------------------------------------------------------------------------
+ Pupil - eye tracking platform
+ Copyright (C) 2012-2015  Pupil Labs
+
+ Distributed under the terms of the CC BY-NC-SA License.
+ License details are in the file LICENSE, distributed as part of this software.
+----------------------------------------------------------------------------------~(*)
+"""
+
+
+""""""  # start delvewheel patch
+def _delvewheel_init_patch_0_0_12():
+    import os
+    import sys
+    libs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, 'ndsi.libs'))
+    if sys.version_info[:2] >= (3, 8):
+        os.add_dll_directory(libs_dir)
+    else:
+        from ctypes import WinDLL
+        with open(os.path.join(libs_dir, '.load-order-ndsi-1.4.2')) as file:
+            load_order = file.read().split()
+        for lib in load_order:
+            WinDLL(os.path.join(libs_dir, lib))
+
+
+_delvewheel_init_patch_0_0_12()
+del _delvewheel_init_patch_0_0_12
+# end delvewheel patch
+
+
+
+
+class CaptureError(Exception):
+    def __init__(self, message):
+        super(CaptureError, self).__init__()
+        self.message = message
+
+
+class StreamError(CaptureError):
+    def __init__(self, message):
+        super(StreamError, self).__init__(message)
+        self.message = message
+
+
+from ndsi.formatter import DataFormat
+
+
+__version__ = "1.4.2"
+__protocol_version__ = str(DataFormat.latest().version_major)
+
+
+from ndsi.network import Network
+from ndsi.sensor import Sensor
+from ndsi.writer import H264Writer
+
+from ndsi import frame
